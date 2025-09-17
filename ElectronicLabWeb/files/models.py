@@ -6,6 +6,7 @@ from django.db import models
 from django.utils import timezone
 from django.core.files.base import ContentFile
 from dotenv import load_dotenv
+import uuid
 
 load_dotenv()
 
@@ -25,11 +26,21 @@ class FileRecord(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def _rename_file(self):
+        ext = os.path.splitext(self.file.name)[1].lower()  # conserva extensión
+        clean_name = f"{self.hash[:12]}_{uuid.uuid4().hex[:8]}{ext}"
+        self.file.name = os.path.join('', clean_name)
+        self.filename = clean_name
+
+
     def save(self, *args, **kwargs):
         # Calcular hash si no existe
         if not self.hash:
             self.hash = hashlib.sha256(self.file.read()).hexdigest()
             self.file.seek(0)
+
+        # Renombrar archivo
+        self._rename_file()
 
         # Detectar MIME
         self.mime_type = self.file.file.content_type
@@ -54,6 +65,8 @@ class FileRecord(models.Model):
     def _generate_resized_versions(self, image):
         base_name = os.path.splitext(os.path.basename(self.file.name))[0]
         ext = image.format.lower()
+        thumb_name = f"{self.hash[:12]}_thumb.{ext}"
+        preview_name = f"{self.hash[:12]}_preview.{ext}"
 
         thumb_size = parse_size(os.getenv('THUMBNAIL_SIZE', '100x100'))
         preview_size = parse_size(os.getenv('PREVIEW_SIZE', '800x800'))
@@ -63,14 +76,14 @@ class FileRecord(models.Model):
         thumb.thumbnail(thumb_size)
         thumb_io = ContentFile(b'')
         thumb.save(thumb_io, format=image.format)
-        self.thumbnail.save(f"{base_name}_thumb.{ext}", thumb_io, save=False)
+        self.thumbnail.save(thumb_name, thumb_io, save=False)
 
         # Vista ampliada
         preview = image.copy()
         preview.thumbnail(preview_size)
         preview_io = ContentFile(b'')
         preview.save(preview_io, format=image.format)
-        self.preview.save(f"{base_name}_preview.{ext}", preview_io, save=False)
+        self.preview.save(preview_name, preview_io, save=False)
 
     def _process_pdf(self):
         # No se necesita procesamiento visual, solo registrar
