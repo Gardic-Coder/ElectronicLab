@@ -1,2 +1,18 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# Entorno virtual
+venv/
+ElectronicLab/
+
+# Archivos sensibles
+.env
+
+# Archivos de Django
+*.sqlite3
+__pycache__/
+*.pyc
+db.sqlite3
+
+# Archivos de usuario
+/media/
+/uploads/

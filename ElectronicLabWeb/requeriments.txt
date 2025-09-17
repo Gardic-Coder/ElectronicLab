@@ -1,2 +1,4 @@
 Django>=4.2
 django-phonenumber-field[phonenumbers]
+Pillow
+python-dotenv
