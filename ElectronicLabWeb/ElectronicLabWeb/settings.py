@@ -43,6 +43,8 @@ INSTALLED_APPS = [
 
     'users', 
     'files',
+    'rest_framework',
+    'phonenumber_field',
 ]
 
 AUTH_USER_MODEL = 'users.User'
