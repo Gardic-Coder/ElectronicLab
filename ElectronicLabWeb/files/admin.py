@@ -1,3 +1,5 @@
+# files/admin.py
 from django.contrib import admin
+from .models import FileRecord
 
-# Register your models here.
+admin.site.register(FileRecord)
