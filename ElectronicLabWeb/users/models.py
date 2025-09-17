@@ -32,4 +32,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.rol})"
     
+    def get_full_name(self):
+        return f"{self.nombre} {self.apellido}"
+    
+    def get_short_name(self):
+        return self.nombre
+    
+    @property
+    def username(self):
+        return self.cedula
+
+    
     objects = UserManager()
