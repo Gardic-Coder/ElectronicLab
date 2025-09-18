@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'phonenumber_field',
     'core',
+    'widget_tweaks',
 ]
 
 AUTH_USER_MODEL = 'users.User'

@@ -4,12 +4,19 @@
 
 {% block content %}
   <h1 class="mb-3">Inventario de Componentes</h1>
-  <p class="lead">
-    Sistema de gestión para el inventario y préstamo de componentes del laboratorio de electrónica de la UNEXPO.
-    Diseñado para estudiantes y profesores, permite registrar, consultar y administrar los recursos disponibles.
-    Inicia sesión para comenzar.
-  </p>
-  <p class="lead">
-    <a href="{% url 'login' %}" class="btn btn-lg btn-primary fw-bold">Iniciar sesión</a>
-  </p>
+  {% if request.user.is_authenticated %}
+    <p class="lead">
+      Bienvenido, {{ request.user.get_full_name|default:request.user.username }} 
+      al sistema de gestión del inventario del laboratorio de electrónica de la UNEXPO.
+    </p>
+  {% else %}
+    <p class="lead">
+      Sistema de gestión para el inventario y préstamo de componentes del laboratorio de electrónica de la UNEXPO.
+      Diseñado para estudiantes y profesores, permite registrar, consultar y administrar los recursos disponibles.
+      Inicia sesión para comenzar.
+    </p>
+    <p class="lead">
+      <a href="{% url 'login' %}" class="btn btn-lg btn-primary fw-bold">Iniciar sesión</a>
+    </p>
+  {% endif %}
 {% endblock %}

@@ -1,12 +1,35 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Iniciar sesión{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2>Iniciar sesión</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Entrar</button>
-  </form>
+<div class="container d-flex justify-content-center align-items-center">
+  <div class="w-100" style="max-width: 360px;">
+    <div class="text-center mb-4">
+      <img src="{% static 'img/unexpo-logo.png' %}?v=2" alt="UNEXPO" width="72" height="72" class="mb-3">
+      <h1 class="h4 mb-3 fw-normal">Iniciar sesión</h1>
+    </div>
+
+    <form method="post" class="text-start">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="{{ form.username.id_for_label }}" class="form-label">Cédula</label>
+        {% render_field form.username class="form-control" %}
+      </div>
+      <div class="mb-3">
+        <label for="{{ form.password.id_for_label }}" class="form-label">Contraseña</label>
+        {% render_field form.password class="form-control" %}
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Iniciar sesión</button>
+    </form>
+
+    {% if form.errors %}
+      <div class="alert alert-danger mt-3" role="alert">
+        <strong>Error:</strong> Credenciales inválidas. Por favor, inténtalo de nuevo.
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
