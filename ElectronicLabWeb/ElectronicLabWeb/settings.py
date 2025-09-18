@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'core',
     'widget_tweaks',
+    'inventory',
 ]
 
 AUTH_USER_MODEL = 'users.User'

@@ -13,7 +13,7 @@
         margin: 0;
         background-size: cover;
         background-position: center;
-        background-repeat: no-repeat;
+        background-repeat: repeat;
       }
       body {
         display: flex;
@@ -48,6 +48,31 @@
       .form-floating > input {
         border-radius: 0.375rem;
       }
+      .card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        cursor: pointer;
+      }
+      .content-wrapper {
+        display: flex;
+        justify-content: center;
+        padding: 2rem 1rem;
+      }
+      .content-background {
+        width: 100%;
+        max-width: 960px;
+        border-radius: 16px;
+        padding: 2rem;
+        background-color: #2aa3fa;
+        transition: background-color 0.3s ease;
+      }
+      [data-bs-theme="light"] .content-background {
+        background-color: #2aa3fa;
+      }
+
+      [data-bs-theme="dark"] .content-background {
+        background-color: #062d59;
+      }
       @media (max-width: 576px) {
         .header-bar {
           flex-direction: column;
@@ -81,7 +106,14 @@
       </header>
 
       <main class="px-3">
-        {% block content %}{% endblock %}
+        <div class="content-wrapper">
+          <div class="content-background">
+            <div class="container py-4">
+              {% block content %}
+              {% endblock %}
+            </div>
+          </div>
+        </div>
       </main>
 
       <footer class="mt-auto text-muted px-3">
