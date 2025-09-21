@@ -16,6 +16,12 @@ def parse_size(size_str):
     except:
         return (800, 800)
 
+def calculate_file_hash(file_obj):
+    file_obj.seek(0)
+    file_hash = hashlib.sha256(file_obj.read()).hexdigest()
+    file_obj.seek(0)
+    return file_hash
+
 class FileRecord(models.Model):
     hash = models.CharField(max_length=64, unique=True)
     file = models.FileField(upload_to='uploads/originals/')
@@ -36,8 +42,9 @@ class FileRecord(models.Model):
     def save(self, *args, **kwargs):
         # Calcular hash si no existe
         if not self.hash:
-            self.hash = hashlib.sha256(self.file.read()).hexdigest()
-            self.file.seek(0)
+            self.hash = calculate_file_hash(self.file)
+            #self.hash = hashlib.sha256(self.file.read()).hexdigest()
+            #self.file.seek(0)
 
         # Renombrar archivo
         self._rename_file()

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block title %}Crear componente{% endblock %}
 
@@ -12,7 +13,8 @@
       {{ form.code.label_tag }} {{ form.code }}
     </div>
     <div class="mb-3">
-      {{ form.description.label_tag }} {{ form.description }}
+      {{ form.description.label_tag }}
+      {{ form.description|add_class:"form-control form-control-sm" }}
     </div>
     <div class="mb-3">
       {{ form.location.label_tag }} {{ form.location }}
@@ -20,12 +22,20 @@
     <div class="mb-3">
       {{ form.stock.label_tag }} {{ form.stock }}
     </div>
+
+    <!-- Buscador de categorías -->
     <div class="mb-3">
-      {{ form.categories.label_tag }}
-      <div class="form-check">
-        {{ form.categories }}
+      <label for="tagInput" class="form-label">Categorías</label>
+      <input type="text" id="tagInput" class="form-control" placeholder="Buscar o crear categoría...">
+      <div id="tagSuggestions" class="list-group mt-1"></div>
+      <div id="selectedTags" class="mt-2"></div>
+      <div id="hiddenTags">
+        {% for tag in selected_tags %}
+          <input type="hidden" name="tags" value="{{ tag }}">
+        {% endfor %}
       </div>
     </div>
+
     <div class="mb-3">
       {{ form.image_file.label_tag }}
       <input type="file" name="image_file" class="form-control" accept="image/*">
@@ -37,4 +47,77 @@
     <button type="submit" class="btn btn-primary">Crear componente</button>
   </form>
 </div>
+
+{{ all_tags_json|json_script:"tag-list" }}
+
+<script>
+const allTags = JSON.parse(document.getElementById("tag-list").textContent);
+const input = document.getElementById("tagInput");
+const suggestions = document.getElementById("tagSuggestions");
+const selectedTags = document.getElementById("selectedTags");
+const hiddenTags = document.getElementById("hiddenTags");
+
+input.addEventListener("input", () => {
+  const query = input.value.toLowerCase();
+  suggestions.innerHTML = "";
+  if (!query) return;
+
+  const matches = allTags.filter(tag => tag.name.toLowerCase().includes(query));
+  if (matches.length === 0) {
+    const createBtn = document.createElement("button");
+    createBtn.className = "list-group-item list-group-item-action text-success";
+    createBtn.textContent = `Crear categoría "${query}"`;
+    createBtn.onclick = (e) => {
+      e.preventDefault();
+      addTag(query);
+      input.value = "";
+      suggestions.innerHTML = "";
+    };
+    suggestions.appendChild(createBtn);
+  } else {
+    matches.forEach(tag => {
+      const item = document.createElement("button");
+      item.className = "list-group-item list-group-item-action";
+      item.textContent = tag.name;
+      item.onclick = (e) => {
+        e.preventDefault();
+        addTag(tag.name);
+        input.value = "";
+        suggestions.innerHTML = "";
+      };
+      suggestions.appendChild(item);
+    });
+  }
+});
+
+function addTag(tagName) {
+  if (document.querySelector(`input[value="${tagName}"]`)) return;
+
+  const badge = document.createElement("span");
+  badge.className = "badge bg-primary me-1";
+  badge.innerHTML = `${tagName} <a href="#" class="text-white ms-1 text-decoration-none" onclick="removeTag('${tagName}')">&times;</a>`;
+  selectedTags.appendChild(badge);
+
+  const hiddenInput = document.createElement("input");
+  hiddenInput.type = "hidden";
+  hiddenInput.name = "tags";
+  hiddenInput.value = tagName;
+  hiddenTags.appendChild(hiddenInput);
+}
+
+function removeTag(tagName) {
+  document.querySelectorAll(`input[value="${tagName}"]`).forEach(el => el.remove());
+  document.querySelectorAll(`#selectedTags span`).forEach(span => {
+    if (span.textContent.includes(tagName)) span.remove();
+  });
+}
+</script>
+<script>
+  document.querySelectorAll('textarea.auto-expand').forEach(textarea => {
+    textarea.addEventListener('input', () => {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    });
+  });
+</script>
 {% endblock %}

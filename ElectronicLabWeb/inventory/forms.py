@@ -9,5 +9,9 @@ class ComponentForm(forms.ModelForm):
         model = Component
         fields = ['code', 'description', 'location', 'stock', 'categories']
         widgets = {
-            'categories': forms.CheckboxSelectMultiple
+            'description': forms.Textarea(attrs={
+                'class': 'form-control auto-expand',
+                'rows': 2,
+                'placeholder': 'Descripción del componente...'
+            })
         }
