@@ -150,15 +150,27 @@ class ComponentUpdateView(UpdateView):
             form.add_error(None, "Clave incorrecta para confirmar la edición.")
             return self.form_invalid(form)
 
+        component = form.save(commit=False)  # ← define primero
+
+        # Eliminar archivos si se solicitó
+        if self.request.POST.get('delete_image') == 'on':
+            component.image = None
+
+        if self.request.POST.get('delete_datasheet') == 'on':
+            component.datasheet = None
+
+        # Subir nuevos archivos si se cargaron
         image_record = self._save_file(self.request.FILES.get('image_file'))
         datasheet_record = self._save_file(self.request.FILES.get('datasheet_file'))
 
+        if image_record:
+            component.image = image_record
+        if datasheet_record:
+            component.datasheet = datasheet_record
+
+        # Actualizar categorías
         tag_names = self.request.POST.getlist('tags')
         categories = [Category.objects.get_or_create(name=name.strip())[0] for name in tag_names]
-
-        component = form.save(commit=False)
-        component.image = image_record or component.image
-        component.datasheet = datasheet_record or component.datasheet
         component.save()
         component.categories.set(categories)
         form.save_m2m()
@@ -167,7 +179,9 @@ class ComponentUpdateView(UpdateView):
         return redirect(self.success_url)
 
     def _validar_clave(self, clave):
-        return clave == "clave_segura"  # reemplaza por tu lógica real
+        user = self.request.user
+        return user.check_password(clave)
+
 
     def _save_file(self, file_obj):
         if not file_obj:
