@@ -8,10 +8,3 @@ class ComponentForm(forms.ModelForm):
     class Meta:
         model = Component
         fields = ['code', 'description', 'location', 'stock', 'categories']
-        widgets = {
-            'description': forms.Textarea(attrs={
-                'class': 'form-control auto-expand',
-                'rows': 2,
-                'placeholder': 'Descripción del componente...'
-            })
-        }

@@ -17,7 +17,7 @@ class Category(models.Model):
 
 class Component(models.Model):
     code = models.CharField(max_length=50, unique=True)  # Ej: NE555
-    description = models.TextField()  # Ej: "Integrado oscilador"
+    description = models.CharField(max_length=100)  # Ej: "Integrado oscilador"
     stock = models.PositiveIntegerField(default=0)
     location = models.CharField(max_length=100, blank=True)
 

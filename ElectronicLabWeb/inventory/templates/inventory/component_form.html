@@ -5,6 +5,7 @@
 {% block title %}Crear componente{% endblock %}
 
 {% block content %}
+<body data-allow-tag-create="true">
 <div class="container py-4">
   <h2>Nuevo componente</h2>
   <form method="post" enctype="multipart/form-data">
@@ -13,8 +14,7 @@
       {{ form.code.label_tag }} {{ form.code }}
     </div>
     <div class="mb-3">
-      {{ form.description.label_tag }}
-      {{ form.description|add_class:"form-control form-control-sm" }}
+      {{ form.description.label_tag }} {{ form.description }}
     </div>
     <div class="mb-3">
       {{ form.location.label_tag }} {{ form.location }}
@@ -50,74 +50,6 @@
 
 {{ all_tags_json|json_script:"tag-list" }}
 
-<script>
-const allTags = JSON.parse(document.getElementById("tag-list").textContent);
-const input = document.getElementById("tagInput");
-const suggestions = document.getElementById("tagSuggestions");
-const selectedTags = document.getElementById("selectedTags");
-const hiddenTags = document.getElementById("hiddenTags");
-
-input.addEventListener("input", () => {
-  const query = input.value.toLowerCase();
-  suggestions.innerHTML = "";
-  if (!query) return;
-
-  const matches = allTags.filter(tag => tag.name.toLowerCase().includes(query));
-  if (matches.length === 0) {
-    const createBtn = document.createElement("button");
-    createBtn.className = "list-group-item list-group-item-action text-success";
-    createBtn.textContent = `Crear categoría "${query}"`;
-    createBtn.onclick = (e) => {
-      e.preventDefault();
-      addTag(query);
-      input.value = "";
-      suggestions.innerHTML = "";
-    };
-    suggestions.appendChild(createBtn);
-  } else {
-    matches.forEach(tag => {
-      const item = document.createElement("button");
-      item.className = "list-group-item list-group-item-action";
-      item.textContent = tag.name;
-      item.onclick = (e) => {
-        e.preventDefault();
-        addTag(tag.name);
-        input.value = "";
-        suggestions.innerHTML = "";
-      };
-      suggestions.appendChild(item);
-    });
-  }
-});
-
-function addTag(tagName) {
-  if (document.querySelector(`input[value="${tagName}"]`)) return;
-
-  const badge = document.createElement("span");
-  badge.className = "badge bg-primary me-1";
-  badge.innerHTML = `${tagName} <a href="#" class="text-white ms-1 text-decoration-none" onclick="removeTag('${tagName}')">&times;</a>`;
-  selectedTags.appendChild(badge);
-
-  const hiddenInput = document.createElement("input");
-  hiddenInput.type = "hidden";
-  hiddenInput.name = "tags";
-  hiddenInput.value = tagName;
-  hiddenTags.appendChild(hiddenInput);
-}
-
-function removeTag(tagName) {
-  document.querySelectorAll(`input[value="${tagName}"]`).forEach(el => el.remove());
-  document.querySelectorAll(`#selectedTags span`).forEach(span => {
-    if (span.textContent.includes(tagName)) span.remove();
-  });
-}
-</script>
-<script>
-  document.querySelectorAll('textarea.auto-expand').forEach(textarea => {
-    textarea.addEventListener('input', () => {
-      textarea.style.height = 'auto';
-      textarea.style.height = textarea.scrollHeight + 'px';
-    });
-  });
-</script>
+<script src="{% static 'js/tagSelector.js' %}"></script>
+</body>
 {% endblock %}
