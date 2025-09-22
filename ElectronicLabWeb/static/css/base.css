@@ -1,0 +1,111 @@
+
+html, body {
+    height: 100%;
+    margin: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: repeat;
+}
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    transition: background-image 0.5s ease-in-out;
+}
+.cover-container {
+    max-width: 42em;
+    width: 100%;
+    padding: 2rem 1rem;
+    margin-left: 4.5rem; /* espacio para el sidebar */
+}
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+.theme-toggle {
+    border: none;
+    background: transparent;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+.form-floating > label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+.form-floating > input {
+    border-radius: 0.375rem;
+}
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    }
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+.content-background {
+    width: 100%;
+    max-width: 960px;
+    border-radius: 16px;
+    padding: 2rem;
+    background-color: #2aa3fa;
+    transition: background-color 0.3s ease;
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 4.5rem;
+    z-index: 1040;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    transition: background-color 0.3s ease;
+    border-right: 1px solid rgba(0,0,0,0.1);
+}
+.sidebar i {
+    transition: transform 0.2s ease;
+}
+.sidebar i:hover {
+    transform: scale(1.2);
+}
+
+[data-bs-theme="light"] .content-background {
+    background-color: #2aa3fa;
+}
+
+[data-bs-theme="dark"] .content-background {
+    background-color: #062d59;
+}
+@media (max-width: 576px) {
+    .header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .cover-container {
+        margin-left: 0;
+    }
+}
+[data-bs-theme="light"] body {
+    background-image: url("/static/img/bg-light.jpg?v=2");
+}
+[data-bs-theme="dark"] body {
+    background-image: url("/static/img/bg-dark.jpg?v=2");
+}
+[data-bs-theme="light"] .sidebar {
+  background-color: #2aa3fa;
+  color: #212529;
+}
+[data-bs-theme="dark"] .sidebar {
+  background-color: #062d59;
+  color: #f8f9fa;
+}
+

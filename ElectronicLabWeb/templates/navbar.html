@@ -1,0 +1,21 @@
+<!-- Escritorio -->
+<nav class="sidebar d-none d-md-flex flex-column flex-shrink-0 p-3 border-end">
+  {% include 'sidebar_items.html' %}
+</nav>
+
+<!-- Móvil -->
+<div class="d-md-none position-fixed top-0 start-0 m-3">
+  <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
+    <i class="bi bi-list fs-4"></i>
+  </button>
+</div>
+
+<div class="offcanvas offcanvas-start offcanvas-sm" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel" style="width: 6rem;">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="mobileSidebarLabel">Menú</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+  </div>
+  <div class="offcanvas-body d-flex flex-column align-items-center">
+    {% include 'sidebar_items.html' %}
+  </div>
+</div>
