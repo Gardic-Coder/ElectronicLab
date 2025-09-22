@@ -37,87 +37,85 @@ Sistema completo para la gestión de inventario, usuarios y préstamos en labora
 
 ```
 ElectronicLab/
-├── ElectronicLabWeb/
-│   ├── core/
-│   │   ├── urls.py
-│   │   ├── views.py
+├── ElectronicLabWeb/                  # Proyecto principal Django
+│
+│   ├── core/                          # Módulo base para vistas generales
+│   │   ├── urls.py                    # Rutas para páginas públicas (ej. inicio)
+│   │   ├── views.py                   # Vista de la página principal
 │   │   └── templates/
 │   │       └── core/
-│   │           └── home.html
-│   │
-│   ├── ElectronicLabWeb/
-│   │   ├── asgi.py
-│   │   ├── settings.py
-│   │   ├── urls.py
-│   │   └── wsgi.py
-│   │
-│   ├── files/             # Manejo de archivos (imagen, PDF)
-│   │   ├── admin.py
-│   │   ├── models.py
-│   │   └── serializers.py # API para guardar archivos
-│   │
-│   ├── inventory/         # Gestión de componentes
-│   │   ├── admin.py
-│   │   ├── models.py      # Componentes, categorías, archivos
-│   │   ├── views.py       # CRUD, vista detallada, migración
-│   │   ├── forms.py       # Formularios de creación y edición
-│   │   ├── urls.py
-│   │   ├── management
-│   │   │   └── commands
-│   │   │       └── clean_orphans.py
-│   │   │
-│   │   └── templates/
-│   │       └── inventory/ # Templates de inventario
-│   │           ├── component_edit.html
-│   │           ├── component_form.html
-│   │           └── component_list.html
-│   │
-│   ├── static/            # Archivos JS y CSS personalizados
-│   │   ├── css/
-│   │   │   └── base.css
-│   │   │
-│   │   ├── img/
-│   │   │   ├── bg-dark.jpg
-│   │   │   ├── bg-light.jpg
-│   │   │   ├── default-user.png
-│   │   │   ├── no-image.png
-│   │   │   └── unexpo-logo.png
-│   │   │
-│   │   └── js/            # tagSelector.js, editGuard.js, etc.
-│   │       ├── base.js
-│   │       ├── componentDetail.js
-│   │       ├── deleteModal.js
-│   │       ├── editGuard.js
-│   │       └── tagSelector.js
-│   │
-│   ├── templates/         # Base general y barra de navegación
-│   │   ├── base.html
-│   │   ├── navbar.html
-│   │   └── sidebar_items.html
-│   │
-│   ├── users/             # Gestión de usuarios y autenticación
-│   │   ├── admin.py
-│   │   ├── models.py      # Modelo personalizado de usuario
-│   │   ├── views.py       # Login, logout, perfil, edición
-│   │   ├── forms.py       # Formularios de perfil y edición
-│   │   ├── urls.py
-│   │   ├── managers.py
-│   │   └── templates/
-│   │       └── users/     # Templates de login, perfil, edición
-│   │           ├── login.html
-│   │           ├── profile_edit.html
-│   │           └── profile.html
-│   │
-│   ├── .env
-│   ├── db.sqlite3
-│   ├── manage.py
-│   └── requeriments.txt  
+│   │           └── home.html          # Template de la página de inicio
 │
-└── media/             # Archivos subidos por los usuarios
+│   ├── ElectronicLabWeb/              # Configuración global del proyecto
+│   │   ├── asgi.py                    # Configuración para despliegue ASGI
+│   │   ├── settings.py                # Configuración principal del proyecto
+│   │   ├── urls.py                    # Enrutador raíz del proyecto
+│   │   └── wsgi.py                    # Configuración para despliegue WSGI
+│
+│   ├── files/                         # Módulo para manejo de archivos
+│   │   ├── admin.py                   # Configuración del admin para archivos
+│   │   ├── models.py                  # Modelo FileRecord (imagen, PDF)
+│   │   └── serializers.py             # API para guardar archivos desde formularios
+│
+│   ├── inventory/                     # Módulo de gestión de componentes
+│   │   ├── admin.py                   # Configuración del admin para inventario
+│   │   ├── models.py                  # Modelos: Componente, Categoría, etc.
+│   │   ├── views.py                   # Vistas: CRUD, detalle, migración
+│   │   ├── forms.py                   # Formularios de creación y edición
+│   │   ├── urls.py                    # Rutas del módulo de inventario
+│   │   ├── management/
+│   │   │   └── commands/
+│   │   │       └── clean_orphans.py   # Comando para limpiar archivos huérfanos
+│   │   └── templates/
+│   │       └── inventory/
+│   │           ├── component_edit.html   # Template para editar componente
+│   │           ├── component_form.html   # Template para crear componente
+│   │           └── component_list.html   # Template para listar componentes
+│
+│   ├── static/                        # Archivos estáticos (CSS, JS, imágenes)
+│   │   ├── css/
+│   │   │   └── base.css               # Estilos base del proyecto
+│   │   ├── img/
+│   │   │   ├── bg-dark.jpg            # Fondo oscuro
+│   │   │   ├── bg-light.jpg           # Fondo claro
+│   │   │   ├── default-user.png       # Imagen por defecto de usuario
+│   │   │   ├── no-image.png           # Imagen por defecto de componente
+│   │   │   └── unexpo-logo.png        # Logo institucional
+│   │   └── js/
+│   │       ├── base.js                # Scripts generales
+│   │       ├── componentDetail.js     # Modal dinámico de detalle de componente
+│   │       ├── deleteModal.js         # Confirmación de eliminación
+│   │       ├── editGuard.js           # Protección contra salida sin guardar
+│   │       └── tagSelector.js         # Selector de categorías (tags)
+│
+│   ├── templates/                     # Templates compartidos
+│   │   ├── base.html                  # Template base con estructura general
+│   │   ├── navbar.html                # Barra de navegación superior
+│   │   └── sidebar_items.html         # Íconos de navegación lateral
+│
+│   ├── users/                         # Módulo de gestión de usuarios
+│   │   ├── admin.py                   # Configuración del admin para usuarios
+│   │   ├── models.py                  # Modelo personalizado de usuario
+│   │   ├── views.py                   # Vistas: login, logout, perfil, edición
+│   │   ├── forms.py                   # Formularios de perfil y edición
+│   │   ├── urls.py                    # Rutas del módulo de usuarios
+│   │   ├── managers.py                # Manager personalizado para autenticación
+│   │   └── templates/
+│   │       └── users/
+│   │           ├── login.html         # Vista de inicio de sesión
+│   │           ├── profile_edit.html  # Vista para editar perfil
+│   │           └── profile.html       # Vista del perfil del usuario
+│
+│   ├── .env                           # Variables de entorno (clave secreta, debug)
+│   ├── db.sqlite3                     # Base de datos SQLite del proyecto
+│   ├── manage.py                      # Script principal para comandos Django
+│   └── requeriments.txt               # Lista de dependencias del proyecto
+│
+└── media/                             # Archivos subidos por los usuarios
     └── uploads/
-        ├── originals
-        ├── previews
-        └── thumbnails
+        ├── originals                  # Archivos originales subidos
+        ├── previews                   # Imágenes de vista previa
+        └── thumbnails                 # Miniaturas generadas
 ```
 
 ---
@@ -225,7 +223,37 @@ python manage.py runserver 0.0.0.0:8000
 
 ## Capturas de Pantalla
 
-*(Se agregarán cuando la interfaz esté más desarrollada)*
+### 💻 Vista en PC
+
+#### Home sin autenticar
+![Home PC](screenshots/home-pc.png)
+
+#### Login
+![Login PC](screenshots/login-pc.png)
+
+#### Home autenticado
+![Home usuario PC](screenshots/user-home-pc.png)
+
+#### Inventario
+![Inventario PC](screenshots/user-inventory-pc.png)
+
+#### Detalle de componente
+![Detalle componente PC](screenshots/detalle-componente-pc.png)
+
+#### Perfil de usuario
+![Perfil usuario PC](screenshots/user-perfil-pc.png)
+
+#### Crear componente
+![creación componente PC](screenshots/crear-componente-pc.png)
+
+#### Edición de perfil
+![Edición perfil PC](screenshots/user-edit-perfil-pc.png)
+
+---
+
+### 📱 Vista en móvil
+
+*(proximamente)*
 
 ---
 
