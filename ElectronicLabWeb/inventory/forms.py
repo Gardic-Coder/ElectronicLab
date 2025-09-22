@@ -7,4 +7,4 @@ class ComponentForm(forms.ModelForm):
 
     class Meta:
         model = Component
-        fields = ['code', 'description', 'location', 'stock', 'categories']
+        fields = ['code', 'description', 'location', 'stock']

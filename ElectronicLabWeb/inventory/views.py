@@ -86,39 +86,11 @@ class ComponentCreateView(CreateView):
 
         messages.success(self.request, "Componente creado exitosamente.")
         return redirect(self.success_url)
-    
-    def post(self, request):
-        form = ComponentForm(request.POST, request.FILES)
-        if form.is_valid():
-            image_record = None
-            datasheet_record = None
 
-            # Subir imagen si se cargó
-            if request.FILES.get('image_file'):
-                image_record = self._save_file(request.FILES['image_file'])
-
-            # Subir datasheet si se cargó
-            if request.FILES.get('datasheet_file'):
-                datasheet_record = self._save_file(request.FILES['datasheet_file'])
-            
-            tag_names = request.POST.getlist('tags')
-            categories = []
-            for name in tag_names:
-                category, _ = Category.objects.get_or_create(name=name.strip())
-                categories.append(category)
-
-            component = form.save(commit=False)
-            component.image = image_record
-            component.datasheet = datasheet_record
-            component.save()
-            component.categories.set(categories)
-            form.save_m2m()
-
-            messages.success(request, "Componente creado exitosamente.")
-            return redirect('inventory:list')
-        return render(request, 'inventory/component_form.html', {'form': form})
-    
     def _save_file(self, file_obj):
+        if not file_obj:
+            return None
+        file_obj.seek(0)
         file_hash = calculate_file_hash(file_obj)
 
         # Verificar si ya existe
