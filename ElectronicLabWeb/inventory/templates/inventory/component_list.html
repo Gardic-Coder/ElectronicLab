@@ -64,7 +64,7 @@
         <div class="row row-cols-1 row-cols-md-3 g-4">
             {% for component in components %}
                 <div class="col">
-                    <div class="card h-100">
+                    <div class="card h-100" onclick="mostrarDetalleComponente({{ component.id }}, event)" style="cursor: pointer;">
                         {% if component.image and component.image.thumbnail %}
                             <img src="{{ component.image.thumbnail.url }}" class="card-img-top" alt="{{ component.code }}">
                         {% else %}
@@ -130,6 +130,22 @@
         </div>
     </div>
 
+    <div class="modal fade" id="componentDetailModal" tabindex="-1" aria-labelledby="componentDetailLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="componentDetailLabel">Detalle del componente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="componentDetailContent" class="text-start">
+                        <!-- Aquí se insertará el contenido dinámico -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <nav class="mt-4">
         <ul class="pagination justify-content-center">
@@ -149,5 +165,8 @@
 {{ all_tags_json|json_script:"tag-list" }}
 
 <script src="{% static 'js/tagSelector.js' %}"></script>
+
+<script src="{% static 'js/componentDetail.js' %}"></script>
+
 </body>
 {% endblock %}

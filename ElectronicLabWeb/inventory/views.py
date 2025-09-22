@@ -13,7 +13,8 @@ from files.models import FileRecord, calculate_file_hash
 from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 
 class ComponentListView(ListView):
     model = Component
@@ -107,55 +108,25 @@ class ComponentCreateView(CreateView):
             return serializer.save()
         return None
 
-#class ComponentCreateView(ListView):
-#    def get(self, request):
-#        form = ComponentForm()
-#        return render(request, 'inventory/component_form.html', {'form': form})
+class ComponentDetailView(View):
+    def get(self, request, pk):
+        component = get_object_or_404(Component, pk=pk)
+        image = component.image
 
-#    def post(self, request):
-#        form = ComponentForm(request.POST, request.FILES)
-#        if form.is_valid():
-#            image_record = None
-#            datasheet_record = None
+        preview_url = image.preview.url if image and image.preview and image.preview.name else None
+        thumbnail_url = image.thumbnail.url if image and image.thumbnail and image.thumbnail.name else None
 
-            # Subir imagen si se cargó
-#            if request.FILES.get('image_file'):
-#                image_record = self._save_file(request.FILES['image_file'])
+        datasheet_url = component.datasheet.file.url if component.datasheet and component.datasheet.file.name else None
 
-            # Subir datasheet si se cargó
-#            if request.FILES.get('datasheet_file'):
-#                datasheet_record = self._save_file(request.FILES['datasheet_file'])
-            
-#            tag_names = request.POST.getlist('tags')
-#            categories = []
-#            for name in tag_names:
-#                category, _ = Category.objects.get_or_create(name=name.strip())
-#                categories.append(category)
+        data = {
+            'code': component.code,
+            'description': component.description,
+            'stock': component.stock,
+            'location': component.location,
+            'categories': [cat.name for cat in component.categories.all()],
+            'preview_url': preview_url,
+            'thumbnail_url': thumbnail_url,
+            'datasheet_url': datasheet_url,
+        }
+        return JsonResponse(data)
 
-#            component = form.save(commit=False)
-#            component.image = image_record
-#            component.datasheet = datasheet_record
-#            component.save()
-#            component.categories.set(categories)
-#            form.save_m2m()
-
-#            messages.success(request, "Componente creado exitosamente.")
-#            return redirect('inventory:list')
-#        return render(request, 'inventory/component_form.html', {'form': form})
-
-#    def _save_file(self, file_obj):
-#        file_hash = calculate_file_hash(file_obj)
-
-        # Verificar si ya existe
-#        existing = FileRecord.objects.filter(hash=file_hash).first()
-#        if existing:
-#            return existing
-
-        # Si no existe, crear nuevo
-#        factory = APIRequestFactory()
-#        drf_request = factory.post('/api/files/', {'file': file_obj}, format='multipart')
-#        request = Request(drf_request, parsers=[MultiPartParser()])
-#        serializer = FileRecordSerializer(data=request.data)
-#        if serializer.is_valid():
-#            return serializer.save()
-#        return None
