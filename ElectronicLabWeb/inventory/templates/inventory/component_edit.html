@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Editar componente{% endblock %}
+
+{% block content %}
+<body data-allow-tag-create="true">
+<div class="container py-4">
+  <div class="mx-auto" style="max-width: 600px;">
+    <h2 class="mb-4 text-center">Editar componente</h2>
+    <form method="post" enctype="multipart/form-data" id="editForm">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label for="id_code" class="form-label" title="Código único del componente">Código</label>
+        {{ form.code|add_class:"form-control"|attr:"placeholder:Ej: NE555" }}
+      </div>
+
+      <div class="mb-3">
+        <label for="id_description" class="form-label" title="Descripción breve del componente">Descripción</label>
+        {{ form.description|add_class:"form-control"|attr:"placeholder:Ej: Integrado oscilador" }}
+      </div>
+
+      <div class="mb-3">
+        <label for="id_location" class="form-label" title="Ubicación física en el laboratorio">Ubicación</label>
+        {{ form.location|add_class:"form-control"|attr:"placeholder:Ej: Estante A3" }}
+      </div>
+
+      <div class="mb-3">
+        <label for="id_stock" class="form-label" title="Cantidad disponible en inventario">Stock</label>
+        {{ form.stock|add_class:"form-control"|attr:"placeholder:Ej: 25" }}
+      </div>
+
+      <!-- Buscador de categorías -->
+      <div class="mb-3">
+        <label for="tagInput" class="form-label" title="Selecciona o crea categorías para clasificar el componente">Categorías</label>
+        <input type="text" id="tagInput" class="form-control" placeholder="Buscar o crear categoría...">
+        <div id="tagSuggestions" class="list-group mt-1"></div>
+        <div id="selectedTags" class="mt-2"></div>
+        <div id="hiddenTags">
+          {% for tag in selected_tags %}
+            <input type="hidden" name="tags" value="{{ tag }}">
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="image_file" class="form-label" title="Imagen representativa del componente">Imagen</label>
+        <input type="file" name="image_file" class="form-control" accept="image/*">
+      </div>
+
+      <div class="mb-3">
+        <label for="datasheet_file" class="form-label" title="Archivo PDF con especificaciones técnicas">Datasheet</label>
+        <input type="file" name="datasheet_file" class="form-control" accept="application/pdf">
+      </div>
+
+      <div class="mb-3">
+        <label for="clave_confirmacion" class="form-label" title="Clave para confirmar la edición">Clave de confirmación</label>
+        <input type="password" name="clave_confirmacion" class="form-control" required>
+      </div>
+
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'inventory:list' %}" class="btn btn-outline-secondary" id="cancelBtn">Volver sin guardar</a>
+        <button type="submit" class="btn btn-success">Guardar cambios</button>
+      </div>
+    </form>
+
+    {% if form.errors %}
+      <div class="alert alert-danger mt-4">
+        <ul class="mb-0">
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{{ all_tags_json|json_script:"tag-list" }}
+<script src="{% static 'js/tagSelector.js' %}"></script>
+<script src="{% static 'js/editGuard.js' %}"></script>
+</body>
+{% endblock %}

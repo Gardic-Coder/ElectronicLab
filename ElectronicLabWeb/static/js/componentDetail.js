@@ -9,6 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const imageUrl = data.preview_url || data.thumbnail_url || "/static/img/no-image.png";
 
+        const editButton = data.can_edit
+        ? `<div class="text-end mt-3">
+            <a href="${data.edit_url}" class="btn btn-outline-warning">Editar componente</a>
+          </div>`
+        : "";
+
         container.innerHTML = `
           <div class="row">
             <div class="col-md-5 text-center">
@@ -21,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <p><strong>Ubicación:</strong> ${data.location}</p>
               <p><strong>Categorías:</strong> ${data.categories.join(', ') || 'Sin categorías'}</p>
               ${data.datasheet_url ? `<p><strong>Datasheet:</strong> <a href="${data.datasheet_url}" target="_blank">Descargar PDF</a></p>` : ''}
+              ${editButton}
             </div>
           </div>
         `;

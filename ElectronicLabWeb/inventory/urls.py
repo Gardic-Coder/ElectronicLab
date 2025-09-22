@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ComponentListView, BulkDeleteView, ComponentCreateView, ComponentDetailView
+from .views import ComponentListView, BulkDeleteView, ComponentCreateView, ComponentDetailView, ComponentUpdateView
 
 app_name = 'inventory'
 
@@ -8,6 +8,7 @@ urlpatterns = [
     path('eliminar/', BulkDeleteView.as_view(), name='bulk_delete'),
     path('crear/', ComponentCreateView.as_view(), name='create'),
     path('detalle/<int:pk>/', ComponentDetailView.as_view(), name='component-detail'),
+    path('editar/<int:pk>/', ComponentUpdateView.as_view(), name='component-edit'),
     # Puedes agregar otras vistas como:
     # path('crear/', ComponentCreateView.as_view(), name='create'),
 ]
