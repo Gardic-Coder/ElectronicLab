@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Editar perfil{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="mx-auto" style="max-width: 600px;">
+    <h2 class="mb-4 text-center">Editar perfil</h2>
+    <form method="post" enctype="multipart/form-data" id="editForm">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label for="id_nombre" class="form-label">Nombre</label>
+        {{ form.nombre|add_class:"form-control" }}
+      </div>
+
+      <div class="mb-3">
+        <label for="id_apellido" class="form-label">Apellido</label>
+        {{ form.apellido|add_class:"form-control" }}
+      </div>
+
+      <div class="mb-3">
+        <label for="id_email" class="form-label">Correo electrónico</label>
+        {{ form.email|add_class:"form-control" }}
+      </div>
+
+      <div class="mb-3">
+        <label for="id_telefono" class="form-label">Teléfono</label>
+        {{ form.telefono|add_class:"form-control" }}
+      </div>
+
+      <div class="mb-3">
+        <label for="photo_file" class="form-label">Foto de perfil</label>
+        {% if usuario.photo and usuario.photo.preview %}
+          <div class="mb-2 text-center">
+            <img src="{{ usuario.photo.preview.url }}" class="img-fluid rounded" alt="Foto actual">
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="delete_photo" id="delete_photo">
+            <label class="form-check-label" for="delete_photo">Eliminar foto actual</label>
+          </div>
+        {% endif %}
+        <input type="file" name="photo_file" class="form-control" accept="image/*">
+      </div>
+
+      <div class="mb-3">
+        <label for="clave_confirmacion" class="form-label">Contraseña actual</label>
+        <input type="password" name="clave_confirmacion" class="form-control" required>
+      </div>
+
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'profile' %}" class="btn btn-outline-secondary" id="cancelBtn">Volver sin guardar</a>
+        <button type="submit" class="btn btn-success">Guardar cambios</button>
+      </div>
+    </form>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger mt-3">
+        {% for error in form.non_field_errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+<script src="{% static 'js/editGuard.js' %}"></script>
+{% endblock %}

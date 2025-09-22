@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi perfil{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="mx-auto" style="max-width: 600px;">
+    <h2 class="mb-4 text-center">Perfil de usuario</h2>
+    <div class="text-center mb-3">
+      {% if usuario.photo and usuario.photo.preview %}
+        <img src="{{ usuario.photo.preview.url }}" class="perfil-circular" alt="Foto de perfil">
+        <!--<img src="{{ usuario.photo.preview.url }}" class="rounded-circle img-thumbnail" style="width: 150px;" alt="Foto de perfil">-->
+      {% else %}
+        <img src="{% static 'img/default-user.png' %}" class="rounded-circle img-thumbnail" style="width: 150px;" alt="Sin foto">
+      {% endif %}
+    </div>
+    <ul class="list-group">
+      <li class="list-group-item"><strong>Nombre:</strong> {{ usuario.get_full_name }}</li>
+      <li class="list-group-item"><strong>Cédula:</strong> {{ usuario.cedula }}</li>
+      <li class="list-group-item">
+        <strong>Correo:</strong>
+        <div class="text-break">{{ usuario.email }}</div>
+      </li>
+      <li class="list-group-item"><strong>Teléfono:</strong> {{ usuario.telefono|default:"No registrado" }}</li>
+      <li class="list-group-item"><strong>Rol:</strong> {{ usuario.get_rol_display }}</li>
+      <li class="list-group-item"><strong>Estado:</strong> {{ usuario.get_estado_display }}</li>
+    </ul>
+    <div class="text-center mt-4">
+      <a href="{% url 'profile-edit' %}" class="btn btn-outline-primary">Editar perfil</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

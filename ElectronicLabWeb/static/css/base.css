@@ -76,6 +76,13 @@ body {
 .sidebar i:hover {
     transform: scale(1.2);
 }
+.perfil-circular {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
 
 [data-bs-theme="light"] .content-background {
     background-color: #2aa3fa;

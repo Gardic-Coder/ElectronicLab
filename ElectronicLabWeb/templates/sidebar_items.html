@@ -7,6 +7,9 @@
   <a href="{% url 'inventory:list' %}" class="d-flex justify-content-center align-items-center mb-3 text-decoration-none" title="Inventario">
     <i class="bi bi-box-seam fs-4"></i>
   </a>
+  <a href="{% url 'profile' %}" class="d-flex justify-content-center align-items-center mb-3 text-decoration-none" title="Editar perfil">
+    <i class="bi bi-person-circle fs-4 text-primary"></i>
+  </a>
   <form method="post" action="{% url 'logout' %}" class="m-0 p-0">
     {% csrf_token %}
     <button type="submit" class="border-0 bg-transparent d-flex justify-content-center align-items-center mb-3 text-decoration-none" title="Cerrar sesión">

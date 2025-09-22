@@ -32,3 +32,9 @@ class UserChangeForm(forms.ModelForm):
         model = User
         fields = ('cedula', 'nombre', 'apellido', 'email', 'telefono', 'rol', 'estado', 'password', 'is_active', 'is_staff')
 
+class UserProfileForm(forms.ModelForm):
+    photo_file = forms.FileField(required=False, label="Foto de perfil")
+
+    class Meta:
+        model = User
+        fields = ['nombre', 'apellido', 'email', 'telefono']
