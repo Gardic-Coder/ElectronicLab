@@ -11,6 +11,8 @@ from .models import User
 from .forms import UserProfileForm
 from files.serializers import FileRecordSerializer
 from files.models import FileRecord, calculate_file_hash
+from django.contrib.auth import update_session_auth_hash
+from django.views import View
 
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'
@@ -72,7 +74,6 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
         context['usuario'] = self.request.user  # ← asegúrate de esto
         return context
 
-
 class UserProfileView(LoginRequiredMixin, DetailView):
     model = User
     template_name = 'users/profile.html'
@@ -80,3 +81,23 @@ class UserProfileView(LoginRequiredMixin, DetailView):
 
     def get_object(self):
         return self.request.user
+
+class ChangePasswordView(LoginRequiredMixin, View):
+    def post(self, request):
+        current = request.POST.get('current_password')
+        new = request.POST.get('new_password')
+        confirm = request.POST.get('confirm_password')
+
+        if new == current:
+            messages.error(request, "La nueva contraseña no puede ser igual a la actual.")
+        elif new != confirm:
+            messages.error(request, "La confirmación no coincide con la nueva contraseña.")
+        elif not request.user.check_password(current):
+            messages.error(request, "La contraseña actual es incorrecta.")
+        else:
+            request.user.set_password(new)
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+            messages.success(request, "Contraseña actualizada correctamente.")
+
+        return redirect('profile')
