@@ -15,8 +15,9 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-class ComponentListView(ListView):
+class ComponentListView(LoginRequiredMixin, ListView):
     model = Component
     template_name = 'inventory/component_list.html'
     context_object_name = 'components'
@@ -43,7 +44,10 @@ class ComponentListView(ListView):
         context['all_tags_json'] = list(Category.objects.values('name'))
         return context
     
-class BulkDeleteView(View):
+class BulkDeleteView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.rol in ['encargado', 'admin'] or self.request.user.is_staff
+    
     def post(self, request):
         ids = request.POST.getlist('selected')
         clave = request.POST.get('clave_confirmacion')
@@ -59,11 +63,14 @@ class BulkDeleteView(View):
         messages.success(request, "Componentes eliminados correctamente.")
         return redirect('inventory:list')
 
-class ComponentCreateView(CreateView):
+class ComponentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Component
     form_class = ComponentForm
     template_name = 'inventory/component_form.html'
     success_url = reverse_lazy('inventory:list')
+
+    def test_func(self):
+        return self.request.user.rol in ['encargado', 'admin'] or self.request.user.is_staff
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -108,7 +115,7 @@ class ComponentCreateView(CreateView):
             return serializer.save()
         return None
 
-class ComponentDetailView(View):
+class ComponentDetailView(LoginRequiredMixin, View):
     def get(self, request, pk):
         component = get_object_or_404(Component, pk=pk)
         image = component.image
@@ -132,11 +139,14 @@ class ComponentDetailView(View):
         }
         return JsonResponse(data)
 
-class ComponentUpdateView(UpdateView):
+class ComponentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Component
     form_class = ComponentForm
     template_name = 'inventory/component_edit.html'
     success_url = reverse_lazy('inventory:list')
+
+    def test_func(self):
+        return self.request.user.rol in ['encargado', 'admin'] or self.request.user.is_staff
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

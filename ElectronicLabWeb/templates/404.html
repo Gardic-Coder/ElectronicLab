@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Página no encontrada{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <h1>404 - Página no encontrada</h1>
+    <p>La dirección que estás buscando no existe o ha sido movida.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary">Volver al inicio</a>
+</div>
+{% endblock %}
