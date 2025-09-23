@@ -1,7 +1,8 @@
 # inventory/views.py
 from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy, reverse
-from django.db.models import Q
+from django.db.models import Q, OuterRef, Subquery, Sum, F, IntegerField, ExpressionWrapper
+from loans.models import LoanComponent
 from .models import Component, Category
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -33,6 +34,20 @@ class ComponentListView(LoginRequiredMixin, ListView):
 
         if tags:
             qs = qs.filter(categories__name__in=tags).distinct()
+        
+        prestado_subquery = LoanComponent.objects.filter(
+            component=OuterRef('pk'),
+            loan__estado='aprobado'
+        ).values('component').annotate(total=Sum('cantidad')).values('total')
+
+        qs = qs.annotate(
+            prestado=Subquery(prestado_subquery, output_field=IntegerField()),
+        ).annotate(
+            available=ExpressionWrapper(
+                F('stock') - F('prestado'),
+                output_field=IntegerField()
+            )
+        )
 
         return qs
 
@@ -118,17 +133,23 @@ class ComponentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 class ComponentDetailView(LoginRequiredMixin, View):
     def get(self, request, pk):
         component = get_object_or_404(Component, pk=pk)
-        image = component.image
 
+        prestado = LoanComponent.objects.filter(
+            component=component,
+            loan__estado='aprobado'
+        ).aggregate(total=Sum('cantidad'))['total'] or 0
+
+        available = max(component.stock - prestado, 0)
+
+        image = component.image
         preview_url = image.preview.url if image and image.preview and image.preview.name else None
         thumbnail_url = image.thumbnail.url if image and image.thumbnail and image.thumbnail.name else None
-
         datasheet_url = component.datasheet.file.url if component.datasheet and component.datasheet.file.name else None
 
         data = {
             'code': component.code,
             'description': component.description,
-            'stock': component.stock,
+            'available': available,
             'location': component.location,
             'categories': [cat.name for cat in component.categories.all()],
             'preview_url': preview_url,
@@ -137,6 +158,11 @@ class ComponentDetailView(LoginRequiredMixin, View):
             'can_edit': request.user.is_staff or getattr(request.user, 'rol', '') == 'encargado',
             'edit_url': reverse('inventory:component-edit', args=[component.pk]),
         }
+
+        if data['can_edit']:
+            data['stock'] = component.stock
+            data['prestado'] = prestado
+
         return JsonResponse(data)
 
 class ComponentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):

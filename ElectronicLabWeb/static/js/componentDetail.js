@@ -23,7 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="col-md-7">
               <h5 class="mb-2">${data.code}</h5>
               <p><strong>Descripción:</strong> ${data.description}</p>
-              <p><strong>Stock:</strong> ${data.stock}</p>
+              <p><strong>Disponible:</strong> ${data.available}</p>
+              ${data.can_edit ? `
+                <p><strong>Existencia:</strong> ${data.stock}</p>
+                <p><strong>Prestado:</strong> ${data.prestado}</p>
+              ` : ''}
               <p><strong>Ubicación:</strong> ${data.location}</p>
               <p><strong>Categorías:</strong> ${data.categories.join(', ') || 'Sin categorías'}</p>
               ${data.datasheet_url ? `<p><strong>Datasheet:</strong> <a href="${data.datasheet_url}" target="_blank">Descargar PDF</a></p>` : ''}
