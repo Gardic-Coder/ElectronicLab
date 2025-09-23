@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'core',
     'widget_tweaks',
     'inventory',
+    'loans',
 ]
 
 AUTH_USER_MODEL = 'users.User'
