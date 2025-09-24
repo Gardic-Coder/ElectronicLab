@@ -34,10 +34,22 @@ document.addEventListener('DOMContentLoaded', () => {
               ${editButton}
             </div>
           </div>
+          ${data.available > 0 ? `
+            <div class="mt-4">
+              <label><strong>Cantidad a solicitar:</strong></label>
+              <div class="input-group" style="max-width: 200px;">
+                <button class="btn btn-outline-secondary" type="button" id="btnDecrementar">−</button>
+                <input type="number" class="form-control text-center" id="cantidadInput" value="${data.cantidad_carrito || 1}" min="1" max="${data.available}">
+                <button class="btn btn-outline-secondary" type="button" id="btnIncrementar">+</button>
+              </div>
+              <button class="btn btn-primary mt-2" id="btnAgregarCarrito">Agregar a la bolsa</button>
+            </div>
+          ` : `<p class="text-danger mt-3"><strong>No disponible para préstamo</strong></p>`}
         `;
 
         const modal = new bootstrap.Modal(document.getElementById('componentDetailModal'));
         modal.show();
+        initLoanCartControls(data.id, data.available);
       });
   };
 });

@@ -2,7 +2,7 @@
 from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q, OuterRef, Subquery, Sum, F, IntegerField, ExpressionWrapper
-from loans.models import LoanComponent
+from loans.models import LoanComponent, LoanCart
 from .models import Component, Category
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -145,11 +145,16 @@ class ComponentDetailView(LoginRequiredMixin, View):
         preview_url = image.preview.url if image and image.preview and image.preview.name else None
         thumbnail_url = image.thumbnail.url if image and image.thumbnail and image.thumbnail.name else None
         datasheet_url = component.datasheet.file.url if component.datasheet and component.datasheet.file.name else None
+        
+        cart_item = LoanCart.objects.filter(user=request.user, component=component).first()
+        cantidad_en_carrito = cart_item.cantidad if cart_item else 1
 
         data = {
+            'id': component.id,
             'code': component.code,
             'description': component.description,
             'available': available,
+            'cantidad_carrito': cantidad_en_carrito,
             'location': component.location,
             'categories': [cat.name for cat in component.categories.all()],
             'preview_url': preview_url,
