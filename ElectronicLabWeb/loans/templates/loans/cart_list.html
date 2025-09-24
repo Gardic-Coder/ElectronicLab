@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bolsa de préstamo{% endblock %}
+
+{% block content %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>Código</th>
+      <th>Descripción</th>
+      <th>Cantidad</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in cart_items %}
+      <tr>
+        <td>{{ item.component.code }}</td>
+        <td>{{ item.component.description }}</td>
+        <td>
+          <input type="number" class="form-control" value="{{ item.cantidad }}"
+                 min="1" max="{{ item.available }}"
+                 onchange="actualizarCantidad('{{ item.component.id }}', this.value)">
+        </td>
+        <td>
+          <button class="btn btn-sm btn-outline-danger" onclick="eliminarDelCarrito('{{ item.component.id }}')">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4">No hay componentes en la bolsa.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<form method="post" action="{% url 'confirmar_prestamo' %}">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-success">Solicitar préstamo</button>
+</form>
+{% endblock %}
