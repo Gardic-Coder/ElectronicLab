@@ -13,6 +13,7 @@ from files.serializers import FileRecordSerializer
 from files.models import FileRecord, calculate_file_hash
 from django.contrib.auth import update_session_auth_hash
 from django.views import View
+from django.http import JsonResponse
 
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'
@@ -101,3 +102,21 @@ class ChangePasswordView(LoginRequiredMixin, View):
             messages.success(request, "Contraseña actualizada correctamente.")
 
         return redirect('profile')
+
+class PerfilUsuarioView(LoginRequiredMixin, View):
+
+    def get(self, request, pk):
+        usuario = User.objects.filter(pk=pk).first()
+        if not usuario:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+
+        return JsonResponse({
+            'nombre': usuario.nombre,
+            'apellido': usuario.apellido,
+            'cedula': usuario.cedula,
+            'email': usuario.email,
+            'telefono': str(usuario.telefono) if usuario.telefono else None,
+            'rol': usuario.get_rol_display(),
+            'estado': usuario.get_estado_display(),
+            'photo': usuario.photo.preview.url if usuario.photo and usuario.photo.preview else None
+        })

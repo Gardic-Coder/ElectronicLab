@@ -1,7 +1,7 @@
 # loans/views.py
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404, render
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils import timezone
 from .models import Loan, LoanComponent, LoanCart
 from inventory.models import Component
@@ -51,7 +51,9 @@ class CarritoPrestamoView(LoginRequiredMixin, TemplateView):
     
 class LoanDetailView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        loan = get_object_or_404(Loan, pk=pk, user=request.user)
+        loan = get_object_or_404(Loan, pk=pk)
+        if loan.user != request.user and request.user.rol != 'encargado' and not request.user.is_staff:
+            return JsonResponse({'error': 'No autorizado'}, status=403)
         items = loan.items.select_related('component').all()
 
         data = {
@@ -152,3 +154,68 @@ class LoanDashboardView(LoginRequiredMixin, ListView):
         context['selected_estado'] = self.request.GET.get('estado', '')
         context['selected_fecha'] = self.request.GET.get('fecha', '')
         return context
+
+class LoanAdminDashboardView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Loan
+    template_name = 'loans/admin_dashboard.html'
+    context_object_name = 'loans'
+    paginate_by = 10
+
+    def test_func(self):
+        return self.request.user.rol in ['encargado', 'admin'] or self.request.user.is_staff
+
+    def get_queryset(self):
+        estado = self.request.GET.get('estado', 'pendiente')
+        fecha = self.request.GET.get('fecha')
+        qs = Loan.objects.all().order_by('fecha_solicitud')
+
+        if estado:
+            qs = qs.filter(estado=estado)
+
+        if fecha:
+            qs = qs.filter(fecha_solicitud=fecha)
+
+        return qs.select_related('user')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['estados'] = ['pendiente', 'aprobado', 'rechazado', 'devuelto']
+        context['selected_estado'] = self.request.GET.get('estado', 'pendiente')
+        context['selected_fecha'] = self.request.GET.get('fecha', '')
+        return context
+    
+class ProcesarPrestamoView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.rol in ['encargado', 'admin'] or self.request.user.is_staff
+
+    def post(self, request, pk):
+        loan = get_object_or_404(Loan, pk=pk)
+        estado = request.POST.get('estado')
+        fecha_devolucion = request.POST.get('fecha_devolucion')
+        observaciones = request.POST.get('observaciones', '')
+
+        if estado not in ['aprobado', 'rechazado']:
+            return JsonResponse({'error': 'Estado inválido'}, status=400)
+
+        # Validar y actualizar cantidades
+        for item in loan.items.all():
+            nueva = int(request.POST.get(f'cantidad_{item.component.id}', item.cantidad))
+            prestado = LoanComponent.objects.filter(
+                component=item.component,
+                loan__estado='aprobado'
+            ).aggregate(total=Sum('cantidad'))['total'] or 0
+            disponible = max(item.component.stock - prestado, 0)
+            if nueva < 1 or nueva > disponible:
+                return JsonResponse({'error': f'Cantidad inválida para {item.component.code}'}, status=400)
+            item.cantidad = nueva
+            item.save()
+
+        loan.estado = estado
+        loan.fecha_aprobacion = timezone.now()
+        loan.fecha_devolucion = fecha_devolucion or None
+        loan.motivo_rechazo = observaciones if estado == 'rechazado' else ''
+        loan.encargado = request.user
+        loan.save()
+
+        return JsonResponse({'success': True})
+

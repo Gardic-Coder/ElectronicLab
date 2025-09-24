@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (
     ConfirmarPrestamoView, CarritoPrestamoView, AgregarAlCarritoView,
-    EliminarDelCarritoView, ActualizarCantidadCarritoView, LoanDashboardView, LoanDetailView
+    EliminarDelCarritoView, ActualizarCantidadCarritoView, LoanDashboardView, LoanDetailView,
+    LoanAdminDashboardView, ProcesarPrestamoView
 )
 
 
@@ -12,6 +13,7 @@ urlpatterns = [
     path('carrito/confirmar/', ConfirmarPrestamoView.as_view(), name='confirmar_prestamo'),
     path('dashboard/', LoanDashboardView.as_view(), name='dashboard'),
     path('prestamo/<int:pk>/', LoanDetailView.as_view(), name='detalle_prestamo'),
-    #path('prestamo/<int:loan_id>/', DetallePrestamoView.as_view(), name='detalle_prestamo'),
+    path('admin/dashboard/', LoanAdminDashboardView.as_view(), name='admin_dashboard'),
+    path('admin/procesar/<int:pk>/', ProcesarPrestamoView.as_view(), name='procesar_prestamo'),
     path('agregar/', AgregarAlCarritoView.as_view(), name='agregar_carrito'),
 ]

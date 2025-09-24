@@ -10,9 +10,15 @@
   <a href="{% url 'ver_carrito' %}" class="d-flex justify-content-center align-items-center mb-3 text-decoration-none" title="Bolsa de préstamo">
     <i class="bi bi-bag-check fs-4 text-info"></i>
   </a>
-  <a href="{% url 'dashboard' %}" class="d-flex justify-content-center align-items-center mb-3 text-decoration-none" title="Historial de solicitudes">
-    <i class="bi bi-clock-history fs-4 text-secondary"></i>
-  </a>
+  {% if request.user.rol == 'encargado' or request.user.is_staff %}
+    <a href="{% url 'admin_dashboard' %}" class="d-flex justify-content-center align-items-center mb-3 text-decoration-none" title="Panel de solicitudes">
+      <i class="bi bi-clipboard-check fs-4 text-warning"></i>
+    </a>
+  {% else %}
+    <a href="{% url 'dashboard' %}" class="d-flex justify-content-center align-items-center mb-3 text-decoration-none" title="Historial de solicitudes">
+      <i class="bi bi-clock-history fs-4 text-secondary"></i>
+    </a>
+  {% endif %}
   <a href="{% url 'profile' %}" class="d-flex justify-content-center align-items-center mb-3 text-decoration-none" title="Editar perfil">
     <i class="bi bi-person-circle fs-4 text-primary"></i>
   </a>

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Solicitudes de préstamo{% endblock %}
+
+{% block content %}
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-4">
+    <select name="estado" class="form-select">
+      {% for est in estados %}
+        <option value="{{ est }}" {% if est == selected_estado %}selected{% endif %}>{{ est|capfirst }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <input type="date" name="fecha" value="{{ selected_fecha }}" class="form-control">
+  </div>
+  <div class="col-md-4">
+    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+  </div>
+</form>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Cédula</th>
+      <th>Fecha</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for loan in loans %}
+      <tr>
+        <td>{{ loan.id }}</td>
+        <td>
+          <a href="#" onclick="verPerfilUsuario('{{ loan.user.id }}')">
+            {{ loan.user.cedula }}
+          </a>
+        </td>
+        <td>{{ loan.fecha_solicitud }}</td>
+        <td>
+          <span class="badge 
+            {% if loan.estado == 'aprobado' %}bg-success
+            {% elif loan.estado == 'rechazado' %}bg-danger
+            {% elif loan.estado == 'devuelto' %}bg-primary
+            {% else %}bg-warning text-dark{% endif %}">
+            {{ loan.estado|capfirst }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-outline-info" onclick="verDetalleAdmin('{{ loan.id }}')">
+            Ver detalle
+          </button>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5">No hay solicitudes pendientes.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<script src="{% static 'js/adminDashboard.js' %}"></script>
+
+{% include 'loans/admin_loan_detail_modal.html' %}
+{% include 'users/user_profile_modal.html' %}
+{% endblock %}

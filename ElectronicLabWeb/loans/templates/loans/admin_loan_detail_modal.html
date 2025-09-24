@@ -1,0 +1,21 @@
+<!-- Modal para detalle y procesamiento de préstamo -->
+<div class="modal fade" id="adminLoanDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalle de solicitud</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="procesarPrestamoForm">
+        <div class="modal-body" id="adminLoanDetailContent">
+          <!-- contenido dinámico -->
+        </div>
+        <input type="hidden" name="estado" id="estadoInput">
+        <div class="modal-footer">
+            <button type="button" class="btn btn-success" onclick="enviarPrestamo('aprobado')">Aprobar</button>
+            <button type="button" class="btn btn-danger" onclick="enviarPrestamo('rechazado')">Rechazar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
