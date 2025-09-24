@@ -19,6 +19,14 @@ class Loan(models.Model):
     observaciones = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    encargado = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='prestamos_procesados'
+    )
+
 
 class LoanComponent(models.Model):
     loan = models.ForeignKey(Loan, on_delete=models.CASCADE, related_name='items')

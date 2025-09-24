@@ -7,7 +7,7 @@ from .models import Loan, LoanComponent, LoanCart
 from inventory.models import Component
 from django.http import JsonResponse
 from django.db.models import Sum
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 
 class ConfirmarPrestamoView(LoginRequiredMixin, View):
     def post(self, request):
@@ -24,7 +24,7 @@ class ConfirmarPrestamoView(LoginRequiredMixin, View):
             )
             item.delete()
 
-        return redirect('detalle_prestamo', loan_id=loan.id)
+        return redirect('')
     
 class CarritoPrestamoView(LoginRequiredMixin, TemplateView):
     template_name = 'loans/cart_list.html'
@@ -44,10 +44,33 @@ class CarritoPrestamoView(LoginRequiredMixin, TemplateView):
         context['cart_items'] = cart_items
         return context
     
-class DetallePrestamoView(LoginRequiredMixin, View):
-    def get(self, request, loan_id, *args, **kwargs):
-        loan = get_object_or_404(Loan, id=loan_id, user=request.user)
-        return render(request, 'loans/loan_detail.html', {'loan': loan})
+#class DetallePrestamoView(LoginRequiredMixin, View):
+#    def get(self, request, loan_id, *args, **kwargs):
+#        loan = get_object_or_404(Loan, id=loan_id, user=request.user)
+#        return render(request, 'loans/loan_detail.html', {'loan': loan})
+    
+class LoanDetailView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        loan = get_object_or_404(Loan, pk=pk, user=request.user)
+        items = loan.items.select_related('component').all()
+
+        data = {
+            'id': loan.id,
+            'estado': loan.estado,
+            'fecha_solicitud': loan.fecha_solicitud,
+            'fecha_aprobacion': loan.fecha_aprobacion,
+            'fecha_devolucion': loan.fecha_devolucion,
+            'observaciones': loan.observaciones,
+            'componentes': [
+                {
+                    'code': item.component.code,
+                    'description': item.component.description,
+                    'cantidad': item.cantidad
+                } for item in items
+            ]
+        }
+        return JsonResponse(data)
+
     
 class AgregarAlCarritoView(LoginRequiredMixin, View):
     def post(self, request):
@@ -103,3 +126,29 @@ class ActualizarCantidadCarritoView(LoginRequiredMixin, View):
 
         LoanCart.objects.filter(user=request.user, component=component).update(cantidad=cantidad)
         return JsonResponse({'success': True})
+
+class LoanDashboardView(LoginRequiredMixin, ListView):
+    model = Loan
+    template_name = 'loans/dashboard.html'
+    context_object_name = 'loans'
+    paginate_by = 10
+
+    def get_queryset(self):
+        estado = self.request.GET.get('estado')
+        fecha = self.request.GET.get('fecha')
+        qs = Loan.objects.filter(user=self.request.user).order_by('-fecha_solicitud')
+
+        if estado:
+            qs = qs.filter(estado=estado)
+
+        if fecha:
+            qs = qs.filter(fecha_solicitud=fecha)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['estados'] = ['pendiente', 'aprobado', 'rechazado', 'devuelto']
+        context['selected_estado'] = self.request.GET.get('estado', '')
+        context['selected_fecha'] = self.request.GET.get('fecha', '')
+        return context
